@@ -1,0 +1,4 @@
+TODO
+
+1. Copy INDOOR.tx from Environment folder to RIB folder
+2. Copy all textures from Textures folder to RIB folder

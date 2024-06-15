@@ -1,0 +1,209 @@
+Hider "raytrace" "int incremental" [1]
+PixelVariance 0.005
+Integrator "PxrUnified" "integrator"
+
+
+Format 1920 1080 1
+Display "finalrender2.tiff" "it" "rgba"
+Projection "perspective" "fov" [30]
+
+DepthOfField 15 2.8 35
+
+# scene/camera parameters
+Translate 2.5 -5 45
+Rotate 0 1 0 0
+Rotate  80 0 1 0
+Rotate  -15 0 0 1
+Scale 2 2 2
+
+WorldBegin
+
+    # Lighting, world attributes, HDR
+    TransformBegin
+        # Surface shader
+        Bxdf "PxrSurface" "default"
+            "color diffuseColor" [0.3 0.3 0.3]
+            "float diffuseGain" [1.0]
+            "int diffuseDoubleSided" [1]
+    
+        # Lighting transformation
+        TransformBegin
+            Rotate 90 1 0 0
+            Rotate 180 0 1 0
+            Rotate 170 0 0 1
+    
+            Light "PxrDomeLight" "HDRLighting"
+                  "float exposure" [-0.9]
+                  "string lightColorMap" ["/home/s5627101/Desktop/BowlRendering/Environment/INDOOR.tx"]
+        TransformEnd
+    
+    TransformEnd
+    
+    # # Outer surface of the bowl (a hemisphere)
+    TransformBegin
+        AttributeBegin
+            Bxdf "PxrDisney" "forOuterSphere"
+                "color baseColor" [0.8 0.1 0.1]
+                "float subsurface" [0.5]
+                "color subsurfaceColor" [0.1 0.1 0.8]
+
+            Translate 0 1 0
+            Scale 2 2 2
+            Rotate -90 1 0 0
+            Sphere 1 -1 0 360
+        AttributeEnd
+    TransformEnd
+
+    
+    # # the inner surface of the bowl
+    TransformBegin
+        AttributeBegin
+            Bxdf "PxrSurface" "steelShader"
+                "color diffuseColor" [0.2 0.2 0.2]
+                "float diffuseGain" [0.0]
+                "color specularEdgeColor" [1.0 1.0 1.0]
+                "color specularFaceColor" [0.5 0.5 0.5]
+                "float specularRoughness" [0.2]
+                "color refractionColor" [0.5 0.5 0.5]
+                "float reflectionGain" [1.0]
+
+            Translate 0 1 0
+            Scale 1.97 1.97 1.97
+            Rotate -90 1 0 0
+            Sphere 1 -1 0 360
+        AttributeEnd
+    TransformEnd
+    
+    # # Water inside bowl
+    TransformBegin
+        AttributeBegin
+            Attribute "visibility" "int transmission" [1]
+            Attribute "trace" "int maxdiffusedepth" [5] "int maxspeculardepth" [8]
+            Bxdf "PxrSurface" "water" 
+                "float glassRoughness" [0.1]
+                "float diffuseGain" [0.0]
+                "float refractionGain" [1] 
+                "float reflectionGain" [1] 
+                "color refractionColor" [1 1 1]  # Set refraction color to white for transparency
+                "int thinGlass" [0]
+
+            TransformBegin
+                Scale 1.9 1.3 1.9
+                Translate 0 0.7 0
+                Rotate 90 1 0 0
+                Sphere 1 0 1 360
+            TransformEnd
+        AttributeEnd
+
+        AttributeBegin
+            Attribute "visibility" "int transmission" [1]
+            Attribute "trace" "int maxdiffusedepth" [5] "int maxspeculardepth" [8]
+            Bxdf "PxrSurface" "water" 
+                "float glassRoughness" [0.1]
+                "float diffuseGain" [0.0]
+                "float refractionGain" [1] 
+                "float reflectionGain" [1] 
+                "color refractionColor" [1 1 1]  # Set refraction color to white for transparency
+                "int thinGlass" [0]
+
+            TransformBegin
+                Translate 0 -0.8 0
+                Scale 1.9 1.3 1.9
+                Rotate -90 1 0 0
+                Disk 1 1 360
+            TransformEnd
+        AttributeEnd
+    TransformEnd
+    
+    # Geometry for the table
+    AttributeBegin
+        TransformBegin
+            # Position the table below the cube
+            Translate 0 -1 0
+            Rotate -7 0 1 0
+            Pattern "PxrTexture" "table_color"
+                "string filename" ["/home/s5627101/Desktop/BowlRendering/Textures/Table_BaseColor.tx"]
+            Pattern "PxrNormalMap" "table_normal"
+                "string filename" ["/home/s5627101/Desktop/BowlRendering/Textures/Table_Normal.tx"]
+            Pattern "PxrTexture" "table_displacement"
+                "string filename" ["/home/s5627101/Desktop/BowlRendering/Textures/Table_Displacement.tx"]
+            Pattern "PxrTexture" "table_roughness"
+                "string filename" ["/home/s5627101/Desktop/BowlRendering/Textures/Table_Roughness.tx"]
+    
+            ## Displacement Shader
+            Displace "PxrDisplace" "table_disp"
+                "reference float dispAmount" ["table_displacement:resultR"]
+
+            ## Surface Shader
+            Bxdf "PxrDisney" "table_material"
+                "reference color baseColor" ["table_color:resultRGB"]
+                "reference normal bumpNormal" ["table_normal:resultN"]
+                "reference float roughness" ["table_roughness:resultR"]
+                "float metallic" [0]
+                "float specular" [0]
+                "float roughness" [10]
+    
+            
+            # Table top
+            TransformBegin
+                Scale 4 0.34 7
+                Polygon "P" [-1 -1 1  1 -1 1  1 1 1  -1 1 1] # Top face
+                Polygon "P" [-1 -1 -1  -1 1 -1  1 1 -1  1 -1 -1] # Bottom face
+                Polygon "P" [-1 1 -1  -1 1 1  1 1 1  1 1 -1] # Front face
+                Polygon "P" [-1 -1 -1  1 -1 -1  1 -1 1  -1 -1 1] # Back face
+                Polygon "P" [-1 -1 -1  -1 -1 1  -1 1 1  -1 1 -1] # Left face
+                Polygon "P" [1 -1 -1  1 1 -1  1 1 1  1 -1 1] # Right face
+            TransformEnd
+
+            # Table legs
+            Bxdf "PxrDisney" "outerbowl" 
+                "color baseColor" [0 0 0]
+
+            TransformBegin
+                Translate -3.8 -4 -3.8
+                Scale 0.2 4 0.25
+                Polygon "P" [-1 -1 1  1 -1 1  1 1 1  -1 1 1]
+                Polygon "P" [-1 -1 -1  -1 1 -1  1 1 -1  1 -1 -1]
+                Polygon "P" [-1 1 -1  -1 1 1  1 1 1  1 1 -1]
+                Polygon "P" [-1 -1 -1  1 -1 -1  1 -1 1  -1 -1 1]
+                Polygon "P" [-1 -1 -1  -1 -1 1  -1 1 1  -1 1 -1]
+                Polygon "P" [1 -1 -1  1 1 -1  1 1 1  1 -1 1]
+            TransformEnd
+
+            TransformBegin
+                Translate 3.8 -4 -3.8
+                Scale 0.2 4 0.25
+                Polygon "P" [-1 -1 1  1 -1 1  1 1 1  -1 1 1]
+                Polygon "P" [-1 -1 -1  -1 1 -1  1 1 -1  1 -1 -1]
+                Polygon "P" [-1 1 -1  -1 1 1  1 1 1  1 1 -1]
+                Polygon "P" [-1 -1 -1  1 -1 -1  1 -1 1  -1 -1 1]
+                Polygon "P" [-1 -1 -1  -1 -1 1  -1 1 1  -1 1 -1]
+                Polygon "P" [1 -1 -1  1 1 -1  1 1 1  1 -1 1]
+            TransformEnd
+
+            TransformBegin
+                Translate -3.8 -4 3.8
+                Scale 0.2 4 0.25
+                Polygon "P" [-1 -1 1  1 -1 1  1 1 1  -1 1 1]
+                Polygon "P" [-1 -1 -1  -1 1 -1  1 1 -1  1 -1 -1]
+                Polygon "P" [-1 1 -1  -1 1 1  1 1 1  1 1 -1]
+                Polygon "P" [-1 -1 -1  1 -1 -1  1 -1 1  -1 -1 1]
+                Polygon "P" [-1 -1 -1  -1 -1 1  -1 1 1  -1 1 -1]
+                Polygon "P" [1 -1 -1  1 1 -1  1 1 1  1 -1 1]
+            TransformEnd
+
+            TransformBegin
+                Translate 3.8 -4 3.8
+                Scale 0.2 4 0.25
+                Polygon "P" [-1 -1 1  1 -1 1  1 1 1  -1 1 1]
+                Polygon "P" [-1 -1 -1  -1 1 -1  1 1 -1  1 -1 -1]
+                Polygon "P" [-1 1 -1  -1 1 1  1 1 1  1 1 -1]
+                Polygon "P" [-1 -1 -1  1 -1 -1  1 -1 1  -1 -1 1]
+                Polygon "P" [-1 -1 -1  -1 -1 1  -1 1 1  -1 1 -1]
+                Polygon "P" [1 -1 -1  1 1 -1  1 1 1  1 -1 1]
+            TransformEnd
+        TransformEnd
+    AttributeEnd
+
+    
+WorldEnd
