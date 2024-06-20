@@ -1,0 +1,268 @@
+OpenShadingLanguage 1.00
+# Compiled by oslc 1.11.0@OPROJECT_VERSION_RELEASE_TYPE@
+# options: 
+shader screwThreads
+param	float	ThreadWidth	0.0450000018		%read{4,4} %write{2147483647,-1}
+param	float	EndV	1		%read{1,60} %write{2147483647,-1}
+param	float	BaseLevel	0		%read{0,19} %write{2147483647,-1}
+param	float	ThreadHeight	4		%read{17,17} %write{2147483647,-1}
+param	float	DirtStart	0.5		%read{35,50} %write{2147483647,-1}
+param	float	DirtyThreadStart	0.800000012		%read{32,32} %write{2147483647,-1}
+param	float	smallNoiseFrequency	2		%read{26,26} %write{2147483647,-1}
+param	float	largeNoiseFrequency	20		%read{28,28} %write{2147483647,-1}
+oparam	float	Displace	0		%read{19,23} %write{0,19}
+oparam	color	Color	0 0 0		%read{30,96} %write{21,96}
+oparam	float	Roughness	0		%read{86,88} %write{31,89}
+global	point	P	%read{25,25} %write{2147483647,-1}
+global	float	u	%read{12,12} %write{2147483647,-1}
+global	float	v	%read{1,76} %write{2147483647,-1}
+local	float	___325_ShaftDistance	%read{6,13} %write{3,12}
+local	float	___325_Revolutions	%read{5,11} %write{4,4}
+local	float	___325_Taper	%read{8,19} %write{7,10}
+local	point	___325_PP	%read{26,28} %write{25,25}
+local	float	___325_smallNoise	%read{43,92} %write{27,27}
+local	float	___325_largeNoise	%read{49,93} %write{29,29}
+temp	int	$tmp1	%read{2,2} %write{1,1}
+const	float	$const1	0.800000012		%read{7,88} %write{2147483647,-1}
+temp	float	$tmp2	%read{7,7} %write{6,6}
+temp	float	$tmp3	%read{6,6} %write{5,5}
+const	float	$const3	2		%read{5,68} %write{2147483647,-1}
+const	float	$const4	1		%read{6,85} %write{2147483647,-1}
+const	float	$const5	0.300000012		%read{8,10} %write{2147483647,-1}
+temp	int	$tmp4	%read{9,9} %write{8,8}
+temp	float	$tmp5	%read{16,16} %write{15,15}
+const	float	$const6	3.1415		%read{13,13} %write{2147483647,-1}
+temp	float	$tmp6	%read{14,14} %write{13,13}
+temp	float	$tmp7	%read{15,15} %write{14,14}
+temp	float	$tmp8	%read{18,18} %write{16,16}
+temp	float	$tmp9	%read{18,18} %write{17,17}
+temp	float	$tmp10	%read{21,21} %write{20,20}
+temp	float	$tmp11	%read{2147483647,-1} %write{22,22}
+temp	float	$tmp12	%read{2147483647,-1} %write{23,23}
+const	string	$const8	"object"		%read{25,25} %write{2147483647,-1}
+const	string	$const9	"transform"		%read{24,24} %write{2147483647,-1}
+const	string	$const10	"common"		%read{25,25} %write{2147483647,-1}
+const	string	$const11	"uperlin"		%read{27,29} %write{2147483647,-1}
+temp	point	$tmp13	%read{27,27} %write{26,26}
+temp	point	$tmp14	%read{29,29} %write{28,28}
+const	int	$const12	0		%read{30,84} %write{2147483647,-1}
+temp	float	$tmp15	%read{31,31} %write{30,30}
+temp	int	$tmp16	%read{33,33} %write{32,32}
+const	color	$const13	1 1 1		%read{34,90} %write{2147483647,-1}
+temp	int	$tmp17	%read{36,36} %write{35,35}
+temp	int	$tmp18	%read{37,42} %write{36,41}
+const	float	$const14	0.100000001		%read{38,95} %write{2147483647,-1}
+temp	float	$tmp19	%read{39,39} %write{38,38}
+temp	int	$tmp20	%read{40,40} %write{39,39}
+temp	int	$tmp21	%read{41,41} %write{40,40}
+temp	float	$tmp22	%read{45,45} %write{43,43}
+const	float	$const16	3		%read{43,49} %write{2147483647,-1}
+temp	float	$tmp23	%read{45,45} %write{44,44}
+temp	float	$tmp24	%read{46,46} %write{45,45}
+temp	color	$tmp25	%read{47,47} %write{46,46}
+temp	color	$tmp26	%read{53,53} %write{47,47}
+temp	color	$tmp27	%read{52,52} %write{48,48}
+temp	float	$tmp28	%read{51,51} %write{49,49}
+temp	float	$tmp29	%read{51,51} %write{50,50}
+temp	float	$tmp30	%read{52,52} %write{51,51}
+temp	color	$tmp31	%read{53,53} %write{52,52}
+temp	color	$tmp33	%read{55,55} %write{54,54}
+temp	color	$tmp34	%read{58,58} %write{55,55}
+temp	float	$tmp35	%read{57,57} %write{56,56}
+temp	float	$tmp36	%read{58,58} %write{57,57}
+temp	color	$tmp37	%read{59,59} %write{58,58}
+temp	float	$tmp38	%read{61,61} %write{60,60}
+temp	int	$tmp39	%read{62,62} %write{61,61}
+temp	float	$tmp40	%read{65,65} %write{63,63}
+const	float	$const18	12		%read{63,69} %write{2147483647,-1}
+temp	float	$tmp41	%read{65,65} %write{64,64}
+temp	float	$tmp42	%read{66,66} %write{65,65}
+temp	color	$tmp43	%read{67,67} %write{66,66}
+temp	color	$tmp44	%read{73,73} %write{67,67}
+temp	color	$tmp45	%read{72,72} %write{68,68}
+temp	float	$tmp46	%read{71,71} %write{69,69}
+temp	float	$tmp47	%read{71,71} %write{70,70}
+temp	float	$tmp48	%read{72,72} %write{71,71}
+temp	color	$tmp49	%read{73,73} %write{72,72}
+temp	color	$tmp50	%read{78,78} %write{73,73}
+temp	color	$tmp52	%read{75,75} %write{74,74}
+temp	color	$tmp53	%read{77,77} %write{75,75}
+const	float	$const20	4		%read{75,75} %write{2147483647,-1}
+const	float	$const21	0.899999976		%read{76,76} %write{2147483647,-1}
+temp	float	$tmp54	%read{77,77} %write{76,76}
+temp	color	$tmp55	%read{78,78} %write{77,77}
+const	float	$const22	0.0500000007		%read{79,79} %write{2147483647,-1}
+temp	color	$tmp56	%read{83,83} %write{79,79}
+temp	color	$tmp57	%read{82,82} %write{80,80}
+const	string	$const23	"clamp"		%read{81,87} %write{2147483647,-1}
+temp	color	$tmp58	%read{83,83} %write{82,82}
+temp	float	$tmp59	%read{85,85} %write{84,84}
+temp	float	$tmp60	%read{86,86} %write{85,85}
+const	float	$const24	0		%read{89,93} %write{2147483647,-1}
+temp	float	$tmp61	%read{89,89} %write{88,88}
+temp	color	$tmp63	%read{94,94} %write{90,90}
+temp	color	$tmp64	%read{94,94} %write{93,93}
+const	float	$const25	0.5		%read{91,91} %write{2147483647,-1}
+temp	float	$tmp65	%read{92,92} %write{91,91}
+temp	float	$tmp66	%read{93,93} %write{92,92}
+temp	color	$tmp67	%read{95,95} %write{94,94}
+temp	color	$tmp68	%read{96,96} %write{95,95}
+code ___main___
+# screwThreads.osl:21
+# 	Displace = BaseLevel;
+	assign		Displace BaseLevel 	%filename{"screwThreads.osl"} %line{21} %argrw{"wr"}
+# screwThreads.osl:23
+# 	if (v < EndV)
+	lt		$tmp1 v EndV 	%line{23} %argrw{"wrr"}
+	if		$tmp1 97 97 	%argrw{"r"}
+# screwThreads.osl:26
+# 		float ShaftDistance = (v) / (EndV);
+	div		___325_ShaftDistance v EndV 	%line{26} %argrw{"wrr"}
+# screwThreads.osl:28
+# 		float Revolutions = EndV / ThreadWidth;		
+	div		___325_Revolutions EndV ThreadWidth 	%line{28} %argrw{"wrr"}
+# screwThreads.osl:30
+# 		float Taper = 0.8 - smoothstep(2*Revolutions, 1.0, ShaftDistance);
+	mul		$tmp3 $const3 ___325_Revolutions 	%line{30} %argrw{"wrr"}
+	smoothstep	$tmp2 $tmp3 $const4 ___325_ShaftDistance 	%argrw{"wrrr"}
+	sub		___325_Taper $const1 $tmp2 	%argrw{"wrr"}
+# screwThreads.osl:33
+# 		if (Taper > 0.3){
+	gt		$tmp4 ___325_Taper $const5 	%line{33} %argrw{"wrr"}
+	if		$tmp4 11 11 	%argrw{"r"}
+# screwThreads.osl:34
+# 			Taper = 0.3;
+	assign		___325_Taper $const5 	%line{34} %argrw{"wr"}
+# screwThreads.osl:38
+# 		ShaftDistance *= Revolutions;
+	mul		___325_ShaftDistance ___325_ShaftDistance ___325_Revolutions 	%line{38} %argrw{"wrr"}
+# screwThreads.osl:39
+# 		ShaftDistance -= u;
+	sub		___325_ShaftDistance ___325_ShaftDistance u 	%line{39} %argrw{"wrr"}
+# screwThreads.osl:41
+# 		Displace = (sin(ShaftDistance * 3.1415 * 2.0) + 1.0) * (ThreadHeight/2.0);
+	mul		$tmp6 ___325_ShaftDistance $const6 	%line{41} %argrw{"wrr"}
+	mul		$tmp7 $tmp6 $const3 	%argrw{"wrr"}
+	sin		$tmp5 $tmp7 	%argrw{"wr"}
+	add		$tmp8 $tmp5 $const4 	%argrw{"wrr"}
+	div		$tmp9 ThreadHeight $const3 	%argrw{"wrr"}
+	mul		Displace $tmp8 $tmp9 	%argrw{"wrr"}
+# screwThreads.osl:43
+# 		Displace = mix(BaseLevel, Displace, Taper);
+	mix		Displace BaseLevel Displace ___325_Taper 	%line{43} %argrw{"wrrr"}
+# screwThreads.osl:48
+#         Color = 1 - Displace, 1 - Displace, 1 - Displace;
+	sub		$tmp10 $const4 Displace 	%line{48} %argrw{"wrr"}
+	assign		Color $tmp10 	%argrw{"wr"}
+	sub		$tmp11 $const4 Displace 	%argrw{"wrr"}
+	sub		$tmp12 $const4 Displace 	%argrw{"wrr"}
+# screwThreads.osl:50
+#         point PP=transform("object",P);
+	functioncall	$const9 26 	%line{50} %argrw{"r"}
+# /opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h:285
+# point  transform (string to, point p)  { return transform("common",to,p); }
+	transform	___325_PP $const10 $const8 P 	%filename{"/opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h"} %line{285} %argrw{"wrrr"}
+# screwThreads.osl:51
+#         float smallNoise=(float)noise("uperlin",PP*smallNoiseFrequency);
+	mul		$tmp13 ___325_PP smallNoiseFrequency 	%filename{"screwThreads.osl"} %line{51} %argrw{"wrr"}
+	noise		___325_smallNoise $const11 $tmp13 	%argrw{"wrr"}
+# screwThreads.osl:52
+#         float largeNoise=(float)noise("uperlin",PP*largeNoiseFrequency);
+	mul		$tmp14 ___325_PP largeNoiseFrequency 	%line{52} %argrw{"wrr"}
+	noise		___325_largeNoise $const11 $tmp14 	%argrw{"wrr"}
+# screwThreads.osl:55
+#         Roughness = Color.r / 2;
+	compref		$tmp15 Color $const12 	%line{55} %argrw{"wrr"}
+	div		Roughness $tmp15 $const3 	%argrw{"wrr"}
+# screwThreads.osl:58
+#         if (v < DirtyThreadStart){
+	lt		$tmp16 v DirtyThreadStart 	%line{58} %argrw{"wrr"}
+	if		$tmp16 35 35 	%argrw{"r"}
+# screwThreads.osl:59
+#             Color = color(1,1,1);
+	assign		Color $const13 	%line{59} %argrw{"wr"}
+# screwThreads.osl:63
+#         if (v > DirtStart && v < (EndV-0.1)){
+	gt		$tmp17 v DirtStart 	%line{63} %argrw{"wrr"}
+	neq		$tmp18 $tmp17 $const12 	%argrw{"wrr"}
+	if		$tmp18 42 42 	%argrw{"r"}
+	sub		$tmp19 EndV $const14 	%argrw{"wrr"}
+	lt		$tmp20 v $tmp19 	%argrw{"wrr"}
+	neq		$tmp21 $tmp20 $const12 	%argrw{"wrr"}
+	assign		$tmp18 $tmp21 	%argrw{"wr"}
+	if		$tmp18 60 79 	%argrw{"r"}
+# screwThreads.osl:67
+#             Color = Color + Color * (3 * smallNoise * (v - DirtStart)) - 2 * Color*(3 * largeNoise * (v - DirtStart));
+	mul		$tmp22 $const16 ___325_smallNoise 	%line{67} %argrw{"wrr"}
+	sub		$tmp23 v DirtStart 	%argrw{"wrr"}
+	mul		$tmp24 $tmp22 $tmp23 	%argrw{"wrr"}
+	mul		$tmp25 Color $tmp24 	%argrw{"wrr"}
+	add		$tmp26 Color $tmp25 	%argrw{"wrr"}
+	mul		$tmp27 $const3 Color 	%argrw{"wrr"}
+	mul		$tmp28 $const16 ___325_largeNoise 	%argrw{"wrr"}
+	sub		$tmp29 v DirtStart 	%argrw{"wrr"}
+	mul		$tmp30 $tmp28 $tmp29 	%argrw{"wrr"}
+	mul		$tmp31 $tmp27 $tmp30 	%argrw{"wrr"}
+	sub		Color $tmp26 $tmp31 	%argrw{"wrr"}
+# screwThreads.osl:70
+# 			Color = Color + (color(1,1,1) - Color) * 2 * ((EndV-0.1)-v);
+	sub		$tmp33 $const13 Color 	%line{70} %argrw{"wrr"}
+	mul		$tmp34 $tmp33 $const3 	%argrw{"wrr"}
+	sub		$tmp35 EndV $const14 	%argrw{"wrr"}
+	sub		$tmp36 $tmp35 v 	%argrw{"wrr"}
+	mul		$tmp37 $tmp34 $tmp36 	%argrw{"wrr"}
+	add		Color Color $tmp37 	%argrw{"wrr"}
+# screwThreads.osl:75
+#         else if (v >= (EndV-0.1)){
+	sub		$tmp38 EndV $const14 	%line{75} %argrw{"wrr"}
+	ge		$tmp39 v $tmp38 	%argrw{"wrr"}
+	if		$tmp39 79 79 	%argrw{"r"}
+# screwThreads.osl:77
+#             Color = Color + Color*(12 * smallNoise * (1 - v)) - 2 * Color*(12 * largeNoise * (1 - v)) + (color(1,1,1) - Color) * 4 * (v-0.9);  
+	mul		$tmp40 $const18 ___325_smallNoise 	%line{77} %argrw{"wrr"}
+	sub		$tmp41 $const4 v 	%argrw{"wrr"}
+	mul		$tmp42 $tmp40 $tmp41 	%argrw{"wrr"}
+	mul		$tmp43 Color $tmp42 	%argrw{"wrr"}
+	add		$tmp44 Color $tmp43 	%argrw{"wrr"}
+	mul		$tmp45 $const3 Color 	%argrw{"wrr"}
+	mul		$tmp46 $const18 ___325_largeNoise 	%argrw{"wrr"}
+	sub		$tmp47 $const4 v 	%argrw{"wrr"}
+	mul		$tmp48 $tmp46 $tmp47 	%argrw{"wrr"}
+	mul		$tmp49 $tmp45 $tmp48 	%argrw{"wrr"}
+	sub		$tmp50 $tmp44 $tmp49 	%argrw{"wrr"}
+	sub		$tmp52 $const13 Color 	%argrw{"wrr"}
+	mul		$tmp53 $tmp52 $const20 	%argrw{"wrr"}
+	sub		$tmp54 v $const21 	%argrw{"wrr"}
+	mul		$tmp55 $tmp53 $tmp54 	%argrw{"wrr"}
+	add		Color $tmp50 $tmp55 	%argrw{"wrr"}
+# screwThreads.osl:80
+#         Color = clamp(Color, 0.05, 1);
+	assign		$tmp56 $const22 	%line{80} %argrw{"wr"}
+	assign		$tmp57 $const4 	%argrw{"wr"}
+	functioncall	$const23 84 	%argrw{"r"}
+# /opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h:162
+# color  clamp (color x, color minval, color maxval) { return max(min(x,maxval),minval); }
+	min		$tmp58 Color $tmp57 	%filename{"/opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h"} %line{162} %argrw{"wrr"}
+	max		Color $tmp58 $tmp56 	%argrw{"wrr"}
+# screwThreads.osl:82
+#         Roughness = Roughness + (1 - Color.r);
+	compref		$tmp59 Color $const12 	%filename{"screwThreads.osl"} %line{82} %argrw{"wrr"}
+	sub		$tmp60 $const4 $tmp59 	%argrw{"wrr"}
+	add		Roughness Roughness $tmp60 	%argrw{"wrr"}
+# screwThreads.osl:83
+#         Roughness = clamp(Roughness, 0, 0.8);
+	functioncall	$const23 90 	%line{83} %argrw{"r"}
+# /opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h:163
+# float  clamp (float x, float minval, float maxval) { return max(min(x,maxval),minval); }
+	min		$tmp61 Roughness $const1 	%filename{"/opt/pixar/RenderManProServer-24.1/lib/osl/include/stdosl.h"} %line{163} %argrw{"wrr"}
+	max		Roughness $tmp61 $const24 	%argrw{"wrr"}
+# screwThreads.osl:86
+#         Color = Color + 0.1 * ((color(1,1,1)-Color)*color(largeNoise, largeNoise * 0.5 * smallNoise,0));
+	sub		$tmp63 $const13 Color 	%filename{"screwThreads.osl"} %line{86} %argrw{"wrr"}
+	mul		$tmp65 ___325_largeNoise $const25 	%argrw{"wrr"}
+	mul		$tmp66 $tmp65 ___325_smallNoise 	%argrw{"wrr"}
+	color		$tmp64 ___325_largeNoise $tmp66 $const24 	%argrw{"wrrr"}
+	mul		$tmp67 $tmp63 $tmp64 	%argrw{"wrr"}
+	mul		$tmp68 $const14 $tmp67 	%argrw{"wrr"}
+	add		Color Color $tmp68 	%argrw{"wrr"}
+	end

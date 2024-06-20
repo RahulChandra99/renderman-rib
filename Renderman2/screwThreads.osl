@@ -1,0 +1,88 @@
+// Thread displacement algorithm modified from Zap Andersson https://github.com/ADN-DevTech/3dsMax-OSL-Shaders
+
+shader screwThreads(
+	// Inputs
+	float  ThreadWidth = 0.045,
+	float  EndV = 1,
+	float  BaseLevel = 0.0,
+	float  ThreadHeight = 4,
+	//where dirt starts from on the inner screw body
+	float  DirtStart = 0.5,
+	//where dirt starts from on outer threads
+	float  DirtyThreadStart = 0.8,
+	float smallNoiseFrequency = 2,
+	float largeNoiseFrequency = 20,
+	// Outputs
+	output float Displace = 0,
+	output color Color = 0,
+    output float Roughness = 0)
+{
+
+	Displace = BaseLevel;
+	
+	if (v < EndV)
+	{
+		//how far down the shaft we are
+		float ShaftDistance = (v) / (EndV);
+		//number of thread revolutions
+		float Revolutions = EndV / ThreadWidth;		
+		//add a smoothstep joint depending on how far down the shaft
+		float Taper = 0.8 - smoothstep(2*Revolutions, 1.0, ShaftDistance);
+
+		//clamp Taper to add some thickness to the thread rather than a sharp point
+		if (Taper > 0.3){
+			Taper = 0.3;
+		}
+		
+		////////////////	DISPLACEMENT 	////////////////
+		ShaftDistance *= Revolutions;
+		ShaftDistance -= u;
+		//compute thread displacement
+		Displace = (sin(ShaftDistance * 3.1415 * 2.0) + 1.0) * (ThreadHeight/2.0);
+		//add taper
+		Displace = mix(BaseLevel, Displace, Taper);
+
+		////////////////	COLOUR + ROUGHNESS 	////////////////
+
+		//start by setting threads to black and inner body to white
+        Color = 1 - Displace, 1 - Displace, 1 - Displace;
+		//create small noise and larger noise
+        point PP=transform("object",P);
+        float smallNoise=(float)noise("uperlin",PP*smallNoiseFrequency);
+        float largeNoise=(float)noise("uperlin",PP*largeNoiseFrequency);
+
+		//make the edges of threads shiny and the recessess less so 
+        Roughness = Color.r / 2;
+        
+        //set clean threads to white
+        if (v < DirtyThreadStart){
+            Color = color(1,1,1);
+        }
+
+        //adds dirt to the inner shaft from DirstStart onwards
+        if (v > DirtStart && v < (EndV-0.1)){
+			//add small dots of dirt to the sections between threads (white sections) [multiplying by Color ensures this is only applied to white]  
+			//doing small noise - large noise masks out the smaller noise by the large noise giving less uniform noise
+			//(v-DirtStart) makes the dirt fade the closer it is to the start instead of having a hard edge
+            Color = Color + Color * (3 * smallNoise * (v - DirtStart)) - 2 * Color*(3 * largeNoise * (v - DirtStart));
+			//add dirt to the threads themselves (black sections) [multiplying by 1-Color ensures it is only applied to black]
+			//((EndV-0.1)-v) causes a fade instead of hard edge as above
+			Color = Color + (color(1,1,1) - Color) * 2 * ((EndV-0.1)-v);
+
+			//dirt displacement was attempted but didn't look natural
+			//float newDisp = Displace - (1 - Displace)*(3 * smallNoise * (v - 0.5)) + 2* (1 - Displace)*(3 * largeNoise * (v - 0.5));  
+        }
+        else if (v >= (EndV-0.1)){
+            //This works the same as above but on the bottom of the shaft the dirt fades towards the bottom rather than the top
+            Color = Color + Color*(12 * smallNoise * (1 - v)) - 2 * Color*(12 * largeNoise * (1 - v)) + (color(1,1,1) - Color) * 4 * (v-0.9);  
+        }
+		//clamp color
+        Color = clamp(Color, 0.05, 1);
+		//make sure dirty areas have low roughnesss
+        Roughness = Roughness + (1 - Color.r);
+        Roughness = clamp(Roughness, 0, 0.8);
+
+        //add subtle yellow and brown tones to dirt (black areas)
+        Color = Color + 0.1 * ((color(1,1,1)-Color)*color(largeNoise, largeNoise * 0.5 * smallNoise,0));
+	}	
+}

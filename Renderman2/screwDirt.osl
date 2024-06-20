@@ -1,0 +1,26 @@
+shader screwDirt (
+	color Cin=1,
+    float freqDirt = 4,
+    float freqRoughSmall = 10,
+    float freqRoughLarge = 60,
+    float dirtColourFreq=40,
+output	color Cout=1,
+output float roughness = 0)
+{
+    //subtract perlin noise from colour
+    Cout-= (float)noise("perlin",u*freqDirt,v*freqDirt) ;
+    //make sure the area with discoulouration is rough
+    roughness += (float)noise("perlin",u*freqDirt,v*freqDirt) ;
+    //add other areas of roughness without discolouration 
+    roughness += (float)noise("perlin",u*freqRoughSmall,v*freqRoughSmall) ;
+    //add some more areas of roughness, that aren't as rough
+    roughness += 0.3 * (float)noise("perlin",u*freqRoughLarge,v*freqRoughLarge) ;
+    //small dots within the areas of darkness to simulate rusting
+    point PP=transform("object",P);
+    //subtract the inverse of brown to make the rust brown
+    Cout-= (1 - Cout) * (float)noise("uperlin",PP*dirtColourFreq) * color(0.6, 0.72, 0.87);
+    //prevent roughness or color reaching extreme values
+    Cout = clamp(Cout, 0.1, 1);
+    roughness = clamp(roughness, 0.15, 1);
+}
+
